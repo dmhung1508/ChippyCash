@@ -1,0 +1,10 @@
+__pycache__/
+.env
+*.pyc
+db_store
+db_chat
+data_emb_coffe
+db_chat
+README.md
+
+
