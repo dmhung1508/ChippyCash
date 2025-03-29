@@ -46,9 +46,73 @@ function isEmailExists($conn, $email, $exclude_id = null) {
   return $stmt->rowCount() > 0;
 }
 
-function registerUser($conn, $name, $username, $email, $password) {
-  $stmt = $conn->prepare("INSERT INTO users (name, username, email, password, created_at) VALUES (?, ?, ?, ?, NOW())");
-  return $stmt->execute([$name, $username, $email, $password]);
+function registerUser($conn, $name, $email, $password) {
+  // Start transaction
+  $conn->beginTransaction();
+  
+  try {
+    // Insert user
+    $stmt = $conn->prepare("INSERT INTO users (name, email, password, created_at) VALUES (?, ?, ?, NOW())");
+    $userInserted = $stmt->execute([$name, $email, $password]);
+    
+    if (!$userInserted) {
+      throw new Exception("Failed to create user account");
+    }
+    
+    // Get the new user ID
+    $userId = $conn->lastInsertId();
+    
+    // Add default income categories
+    $incomeCategories = [
+      ['Lương', 'Thu nhập từ lương hàng tháng hoặc công việc chính', 'income'],
+      ['Tiền thưởng', 'Tiền thưởng từ công việc hoặc dự án', 'income'],
+      ['Tiền lãi', 'Tiền lãi từ các khoản đầu tư', 'income'],
+      ['Tiền bán hàng', 'Tiền từ việc bán hàng hóa hoặc dịch vụ', 'income']
+    ];
+    
+    // Add default expense categories
+    $expenseCategories = [
+      ['Tiền ăn uống', 'Tiền ăn uống hàng ngày', 'expense'],
+      ['Tiền đi lại', 'Tiền đi lại hàng ngày', 'expense'],
+      ['Tiền học tập', 'Tiền học tập hàng tháng', 'expense'],
+      ['Tiền giải trí', 'Tiền giải trí hàng tháng', 'expense'],
+      ['Tiền xăng', 'Tiền xăng hàng tháng', 'expense'],
+      ['Tiền nước', 'Tiền nước hàng tháng', 'expense'],
+      ['Tiền điện', 'Tiền điện hàng tháng', 'expense'],
+      ['Tiền mua sắm', 'Tiền mua sắm hàng tháng', 'expense'],
+      ['Tiền khác', 'Tiền khác hàng tháng', 'expense']
+    ];
+    
+    // Prepare statement for inserting categories
+    $categoryStmt = $conn->prepare("INSERT INTO categories (user_id, name, description, type, created_at) 
+                                   VALUES (?, ?, ?, ?, NOW())");
+    
+    // Insert income categories
+    foreach ($incomeCategories as $category) {
+      $categoryInserted = $categoryStmt->execute([$userId, $category[0], $category[1], $category[2]]);
+      if (!$categoryInserted) {
+        throw new Exception("Failed to create default income categories");
+      }
+    }
+    
+    // Insert expense categories
+    foreach ($expenseCategories as $category) {
+      $categoryInserted = $categoryStmt->execute([$userId, $category[0], $category[1], $category[2]]);
+      if (!$categoryInserted) {
+        throw new Exception("Failed to create default expense categories");
+      }
+    }
+    
+    // Commit transaction
+    $conn->commit();
+    return true;
+    
+  } catch (Exception $e) {
+    // Rollback transaction on error
+    $conn->rollBack();
+    error_log("Registration error: " . $e->getMessage());
+    return false;
+  }
 }
 
 function updateUserProfile($conn, $user_id, $name, $username, $email) {
