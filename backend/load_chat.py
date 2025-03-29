@@ -65,7 +65,8 @@ def load_chat_store_user(idd):
         chat_store = SimpleChatStore()
     return chat_store
 def save_income_expense(id_user, name, amount):
-    """Lưu dữ liệu thu nhập của người dùng vào trong file khi có thông tin thu nhập
+    """Lưu dữ liệu thu nhập của người dùng vào trong file khi có thông tin thu nhập, chỉ có trong các loại thu nhập đã được định nghĩa trước đó, không cho phép người dùng tự định nghĩa loại thu nhập
+    (lương, tiền thưởng, tiền bán hàng, ...)
 
     Args:
         id_user (string): id của người dùng
@@ -89,7 +90,8 @@ def save_income_expense(id_user, name, amount):
     with open(f"{user_dir}/bill.json", "w") as f:
         json.dump(data, f)
 def save_outcome_expense(id_user, name, amount):
-    """Lưu dữ liệu chi tiêu của người dùng vào trong file khi có thông tin chi tiêu
+    """Lưu dữ liệu chi tiêu của người dùng vào trong file khi có thông tin chi tiêu, chỉ có trong các loại chi tiêu đã được định nghĩa trước đó, không cho phép người dùng tự định nghĩa loại chi tiêu
+    (tiền ăn uống, tiền đi lại, tiền học tập, ...)
 
     Args:
         id_user (string): id của người dùng
