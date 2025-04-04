@@ -130,7 +130,7 @@ def load_bill(id_user):
     else:
         data = []
     return data
-def initialize_chatbot_user(chat_store, id_user):
+def initialize_chatbot_user(chat_store, id_user, role):
     get_date_time_tool = FunctionTool.from_defaults( fn = get_date_time )
     load_bill_tool = FunctionTool.from_defaults( fn = load_bill )
     save_income_expense_tool = FunctionTool.from_defaults( fn = save_income_expense )
@@ -143,7 +143,7 @@ def initialize_chatbot_user(chat_store, id_user):
             chat_store_key=id_user
         )
 
-    system_prompt = get_prompt(id_user)
+    system_prompt = get_prompt(id_user, role)
     print(system_prompt)
     agent = OpenAIAgent.from_tools(
         tools=[
