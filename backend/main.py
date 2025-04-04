@@ -32,6 +32,7 @@ app.add_middleware(
 class Chat(BaseModel):
     id_user: str
     message: str
+    role: Optional[str] = "trợ lý thông minh"
 class Delete(BaseModel):
     id_user: str
 
@@ -92,7 +93,7 @@ async def chat(
 ):
     try:
         chat_store = load_chat_store_user(chat.id_user)
-        agent = initialize_chatbot_user(chat_store, chat.id_user)
+        agent = initialize_chatbot_user(chat_store, chat.id_user, chat.role)
         response = chat_interface(agent, chat_store, chat.message, chat.id_user)
 
         return {
@@ -121,3 +122,22 @@ async def delete(
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8506, reload=True)
+
+@app.get("/history")
+async def get_history(
+    id_user: str
+):
+    try:
+        if os.path.exists(f"db_chat/{id_user}/chat_history.json"):
+            with open(f"db_chat/{id_user}/chat_history.json", "r") as f:
+                chat_history = json.load(f)
+        else:
+            chat_history = []
+        return {
+            "history": chat_history,
+        }
+    except Exception as e:
+        return {
+            "message": str(e),
+            "history": {}
+        }
