@@ -41,4 +41,3 @@ header('Content-Type: text/html; charset=utf-8');
         </div>
     </nav>
     <?php endif; ?>
-
