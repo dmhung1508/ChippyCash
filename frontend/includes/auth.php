@@ -41,7 +41,7 @@
                 <div class="form-group">
                     <label for="username">Tên đăng nhập</label>
                     <input type="text" id="username" name="username" required>
-                    <!-- <p class="form-hint">Tên đăng nhập phải có ít nhất 3 ký tự và không chứa khoảng trắng</p> -->
+                    <p class="form-hint">Tên đăng nhập phải có ít nhất 3 ký tự và không chứa khoảng trắng</p>
                 </div>
                 
                 <div class="form-group">
@@ -128,4 +128,3 @@
         text-decoration: underline;
     }
 </style>
-

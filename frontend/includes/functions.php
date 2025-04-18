@@ -391,4 +391,3 @@ function validateRequiredFields($fields) {
   return true;
 }
 ?>
-

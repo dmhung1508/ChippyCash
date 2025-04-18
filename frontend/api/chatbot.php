@@ -202,4 +202,3 @@ function getTransactionCount($conn, $user_id, $type = null) {
     return $stmt->fetchColumn() ?: 1; // Tránh chia cho 0
 }
 ?>
-
