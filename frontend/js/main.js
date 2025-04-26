@@ -757,20 +757,77 @@ document.addEventListener("DOMContentLoaded", () => {
       qaMessages.scrollTop = qaMessages.scrollHeight
     }
 
-    // Gửi tin nhắn đến API chatbot - Đơn giản hóa
-    const sendChatMessage = async () => {
-      const message = questionInput.value.trim()
+    // Hàm phân tích ảnh hóa đơn
+    const analyzeBillImage = async (file) => {
+      if (!file || isProcessing) return
+
+      isProcessing = true
+
+      try {
+        // Hiển thị thông báo đang xử lý
+        const loadingMessage = addMessageToChat("Đang phân tích ảnh hóa đơn...", "bot")
+        showTypingIndicator()
+
+        // Tạo FormData để gửi file
+        const formData = new FormData()
+        formData.append("file", file)
+        formData.append("input_text", "phân tích ảnh")
+
+        // Gửi ảnh đến API phân tích
+        const response = await fetch("http://127.0.0.1:8506/analyze-bill", {
+          method: "POST",
+          headers: {
+            accept: "application/json",
+          },
+          body: formData,
+        })
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`)
+        }
+
+        const data = await response.json()
+
+        // Xóa thông báo đang xử lý và chỉ báo đang nhập
+        if (loadingMessage && loadingMessage.parentNode) {
+          loadingMessage.remove()
+        }
+        removeTypingIndicator()
+
+        // Kiểm tra kết quả phân tích
+        if (data.output_text) {
+          // Gửi kết quả phân tích trực tiếp đến API chat
+          await sendChatMessage(data.output_text, false)
+        } else {
+          addMessageToChat("Không thể phân tích ảnh. Vui lòng thử lại với ảnh khác.", "bot")
+        }
+      } catch (error) {
+        console.error("Error analyzing image:", error)
+        removeTypingIndicator()
+        addMessageToChat("Đã xảy ra lỗi khi phân tích ảnh. Vui lòng thử lại sau.", "bot")
+      } finally {
+        isProcessing = false
+      }
+    }
+
+    // Sửa lại hàm sendChatMessage để có thể nhận message từ bên ngoài
+    const sendChatMessage = async (externalMessage = null, showUserMessage = true) => {
+      const message = externalMessage || questionInput.value.trim()
       if (!message || isProcessing) return
 
       isProcessing = true
 
       try {
-        // Thêm tin nhắn người dùng vào chat
-        addMessageToChat(message, "user")
-        questionInput.value = ""
+        // Thêm tin nhắn người dùng vào chat nếu cần
+        if (showUserMessage) {
+          addMessageToChat(message, "user")
+          questionInput.value = ""
+        }
 
-        // Hiển thị chỉ báo đang nhập
-        showTypingIndicator()
+        // Hiển thị chỉ báo đang nhập nếu không phải từ phân tích ảnh
+        if (showUserMessage) {
+          showTypingIndicator()
+        }
 
         // Lấy role được chọn
         const selectedRole = roleSelect ? roleSelect.value : "Trợ lý thông minh"
@@ -798,8 +855,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const data = await response.json()
 
-        // Xóa chỉ báo đang nhập
-        removeTypingIndicator()
+        // Xóa chỉ báo đang nhập nếu không phải từ phân tích ảnh
+        if (showUserMessage) {
+          removeTypingIndicator()
+        }
 
         // Thêm phản hồi bot
         if (data.message) {
@@ -816,20 +875,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       } catch (error) {
         console.error("Error:", error)
-        removeTypingIndicator()
+        if (showUserMessage) {
+          removeTypingIndicator()
+        }
         addMessageToChat("Đã xảy ra lỗi kết nối. Vui lòng thử lại sau.", "bot")
       } finally {
         isProcessing = false
       }
-    }
-
-    // Sự kiện chatbot
-    if (sendQuestion) {
-      sendQuestion.addEventListener("click", () => {
-        if (!isProcessing) {
-          sendChatMessage()
-        }
-      })
     }
 
     if (questionInput) {
@@ -840,6 +892,84 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       })
     }
+
+    // Thêm nút tải lên ảnh và xử lý sự kiện
+    const setupImageUpload = () => {
+      // Tìm phần qa-input
+      const qaInput = document.querySelector(".qa-input")
+      if (!qaInput) return
+
+      // Tạo nút tải lên ảnh
+      const uploadButton = document.createElement("button")
+      uploadButton.className = "btn-icon"
+      uploadButton.title = "Tải lên ảnh hóa đơn"
+      uploadButton.innerHTML = '<i class="fas fa-image"></i>'
+      uploadButton.style.marginRight = "10px"
+
+      // Tạo input file ẩn
+      const fileInput = document.createElement("input")
+      fileInput.type = "file"
+      fileInput.accept = "image/*"
+      fileInput.style.display = "none"
+      fileInput.id = "bill-image-upload"
+
+      // Thêm sự kiện cho nút tải lên
+      uploadButton.addEventListener("click", () => {
+        if (!isProcessing) {
+          fileInput.click()
+        }
+      })
+
+      // Xử lý khi người dùng chọn file
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files[0]) {
+          const file = e.target.files[0]
+
+          // Kiểm tra loại file
+          if (!file.type.startsWith("image/")) {
+            addMessageToChat("Vui lòng chọn file ảnh hợp lệ.", "bot")
+            return
+          }
+
+          // Hiển thị ảnh đã chọn
+          const reader = new FileReader()
+          reader.onload = (event) => {
+            // Tạo tin nhắn với ảnh
+            const messageElement = document.createElement("div")
+            messageElement.className = "message user"
+
+            const messageContent = document.createElement("div")
+            messageContent.className = "message-content"
+
+            const imagePreview = document.createElement("img")
+            imagePreview.src = event.target.result
+            imagePreview.style.maxWidth = "100%"
+            imagePreview.style.maxHeight = "200px"
+            imagePreview.style.borderRadius = "8px"
+
+            messageContent.appendChild(imagePreview)
+            messageElement.appendChild(messageContent)
+            qaMessages.appendChild(messageElement)
+            qaMessages.scrollTop = qaMessages.scrollHeight
+
+            // Phân tích ảnh
+            analyzeBillImage(file)
+          }
+
+          reader.readAsDataURL(file)
+
+          // Reset input để có thể chọn lại cùng một file
+          fileInput.value = ""
+        }
+      })
+
+      // Chèn các phần tử vào DOM
+      qaInput.insertBefore(uploadButton, qaInput.firstChild)
+      qaInput.appendChild(fileInput)
+    }
+
+    // Gọi hàm thiết lập tải lên ảnh
+    setupImageUpload()
   }
 
   // Initialize all components

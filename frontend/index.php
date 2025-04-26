@@ -317,11 +317,11 @@ include 'includes/header.php';
                    </div>
                </div>
                <div class="qa-input">
-                   <input type="text" id="questionInput" placeholder="Nhập câu hỏi hoặc mô tả giao dịch của bạn...">
-                   <button id="sendQuestion" class="btn-primary">
-                       <i class="fas fa-paper-plane"></i>
-                   </button>
-               </div>
+    <input type="text" id="questionInput" placeholder="Nhập câu hỏi hoặc mô tả giao dịch của bạn...">
+    <button id="sendQuestion" class="btn-primary">
+        <i class="fas fa-paper-plane"></i>
+    </button>
+</div>
                <input type="hidden" id="user-id" value="<?php echo $_SESSION['user_id']; ?>">
            </div>
        </div>
