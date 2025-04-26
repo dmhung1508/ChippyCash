@@ -12,6 +12,16 @@ import tempfile
 import shutil
 from load_chat import load_chat_store_user, initialize_chatbot_user, chat_interface
 from fastapi.middleware.cors import CORSMiddleware
+import openai
+from openai import OpenAI
+from openai import Client
+import base64
+from fastapi import HTTPException
+from fastapi.responses import JSONResponse
+
+client = Client(
+    api_key=os.getenv("OPENAI_API_KEY"),
+)
 
 
 app = FastAPI(
@@ -35,7 +45,79 @@ class Chat(BaseModel):
     role: Optional[str] = "trợ lý thông minh"
 class Delete(BaseModel):
     id_user: str
+class ImageAnalysisRequest(BaseModel):
+    image_base64: str
 
+@app.post("/analyze-bill")
+async def analyze_bill(
+    file: UploadFile = File(...),
+    input_text: str = Form(...)
+):
+    # Kiểm tra loại file
+    if file.content_type not in ["image/jpeg", "image/png"]:
+        raise HTTPException(status_code=400, detail="Chỉ hỗ trợ file JPEG hoặc PNG.")
+
+    # Đọc dữ liệu file và encode base64
+    file_bytes = await file.read()
+    image_base64 = base64.b64encode(file_bytes).decode("utf-8")
+
+    # Gửi request đến OpenAI
+    response = client.responses.create(
+        model="gpt-4.1-mini",
+        input=[
+            {
+                "role": "system",
+                "content": [
+                    {
+                        "type": "input_text",
+                        "text": (
+                            "Extract information from an uploaded image of a payment bill to create an output in the format \"(product) - (amount)\".\n\n"
+                            "- Analyze the image to identify and extract relevant text, specifically focusing on identifying product names and the associated amounts.\n"
+                            "- Ensure accuracy in transcription from the image to text.\n"
+                            "- Output the extracted data in the specified format for each item present in the bill.\n\n"
+                            "# Output Format\n\n"
+                            "The output should be a list of each product and its corresponding amount in the format: \"(product) - (amount)\". Each product should be on a new line.\n\n"
+                            "# Notes\n\n"
+                            "- Ensure to accurately capture the product names and associated amounts despite potential variations in layout or language on the bill.\n"
+                            "- Handle possible discrepancies like poor image quality or unclear text within the bill when extracting information."
+                        )
+                    }
+                ]
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "input_image",
+                        "image_url": f"data:{file.content_type};base64,{image_base64}"
+                    },
+                    {
+                        "type": "input_text",
+                        "text": input_text  # Dùng input_text user gửi vào
+                    }
+                ]
+            }
+        ],
+        text={
+            "format": {
+                "type": "text"
+            }
+        },
+        reasoning={},
+        tools=[],
+        temperature=1,
+        max_output_tokens=2048,
+        top_p=1,
+        store=True
+    )
+
+
+    # Trả kết quả
+    # Extract the text content from the response
+    output_text = response.output[0].content[0].text
+
+    # Create a directory for storing bill information if it doesn't exist
+    return {"output_text": output_text}
 @app.get("/")
 def read_root():
     return "USE POST"
