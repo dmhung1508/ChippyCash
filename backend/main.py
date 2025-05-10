@@ -115,6 +115,7 @@ async def analyze_bill(
     # Trả kết quả
     # Extract the text content from the response
     output_text = response.output[0].content[0].text
+    print(output_text)
 
     # Create a directory for storing bill information if it doesn't exist
     return {"output_text": output_text}
