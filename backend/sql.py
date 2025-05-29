@@ -2,10 +2,10 @@ import mysql.connector
 
 # Thông tin kết nối MySQL trên cPanel
 db_config = {
-    "host": "103.82.24.7",  # Hoặc có thể dùng 'znsdpzlo.cloudfly.vn'
-    "user": "zeznsdp_chippycash",
-    "password": "Dinhhung1508@",
-    "database": "zeznsdp_chippycash",  # Thay bằng tên database thực tế
+    "host": "localhost",  # Hoặc có thể dùng 'znsdpzlo.cloudfly.vn'
+    "user": "root",
+    "password": "hung1234",
+    "database": "chippy",  # Thay bằng tên database thực tế
 }
 def get_connection():
     """Tạo và trả về kết nối đến cơ sở dữ liệu"""
@@ -15,7 +15,7 @@ def get_connection():
     except mysql.connector.Error as e:
         print(f"❌ Lỗi kết nối: {e}")
         return None
-
+     
 def get_user_id_by_username(username):
     """Lấy ID của user dựa trên username/email"""
     conn = get_connection()
@@ -34,7 +34,34 @@ def get_user_id_by_username(username):
     finally:
         cursor.close()
         conn.close()
+def get_user_id_by_id(id):
+    """Lấy ID của user dựa trên username/email"""
+    conn = get_connection()
+    if not conn:
+        return None
 
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT id FROM users WHERE id = %s", (id,))
+        user = cursor.fetchone()
+        return user['id'] if user else None
+    except mysql.connector.Error as e:
+        print(f"❌ Lỗi truy vấn: {e}")
+        return None
+def get_username_by_id(id):
+    """Lấy username của user dựa trên id"""
+    conn = get_connection()
+    if not conn:
+        return None
+    
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT username FROM users WHERE id = %s", (id,))
+        user = cursor.fetchone()
+        return user['username'] if user else None
+    except mysql.connector.Error as e:
+        print(f"❌ Lỗi truy vấn: {e}")
+        return None
 def get_categories_by_username(username):
     """Lấy tất cả categories của một user dựa trên username"""
     user_id = get_user_id_by_username(username)
@@ -137,15 +164,15 @@ if __name__ == "__main__":
         print("📌 Danh sách bảng trong database:")
         for table in cursor.fetchall():
             print(table)
-            
+        print(get_username_by_id("4"))
         print("\n📋 Tất cả categories của demo_user:")
-        print(get_categories_by_username("demo_user"))
+        print(get_categories_by_username(get_username_by_id("4")))
         
         print("\n💰 Income categories của demo_user:")
-        print(get_categories_by_type("demo_user", "income"))
+        print(get_categories_by_type("1", "income"))
         
         print("\n💸 Expense categories của demo_user:")
-        print(get_categories_by_type("demo_user", "expense"))
+        print(get_categories_by_type("1", "expense"))
         
         # Đóng kết nối
         cursor.close()

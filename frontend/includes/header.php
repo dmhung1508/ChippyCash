@@ -1,5 +1,8 @@
 <?php
 header('Content-Type: text/html; charset=utf-8');
+if (isset($_SESSION['user_id']) && !isset($conn)) {
+    require_once __DIR__ . '/../config/database.php';
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -28,6 +31,20 @@ header('Content-Type: text/html; charset=utf-8');
                 <a href="categories.php" class="navbar-item <?php echo basename($_SERVER['PHP_SELF']) == 'categories.php' ? 'active' : ''; ?>">
                     <i class="fas fa-tags"></i> Thể loại
                 </a>
+                <a href="bank.php" class="navbar-item <?php echo basename($_SERVER['PHP_SELF']) == 'bank.php' ? 'active' : ''; ?>">
+                    <i class="fas fa-university"></i> Ngân hàng
+                </a>
+                <?php 
+                // Kiểm tra quyền admin
+                $stmt = $conn->prepare("SELECT role FROM users WHERE id = ?");
+                $stmt->execute([$_SESSION['user_id']]);
+                $currentUser = $stmt->fetch();
+                if ($currentUser && $currentUser['role'] === 'admin'): 
+                ?>
+                <a href="admin.php" class="navbar-item <?php echo basename($_SERVER['PHP_SELF']) == 'admin.php' ? 'active' : ''; ?>" style="color: #fbbf24;">
+                    <i class="fas fa-crown"></i> Admin
+                </a>
+                <?php endif; ?>
                 <div class="navbar-dropdown">
                     <button class="dropdown-toggle">
                         <i class="fas fa-user"></i> <?php echo htmlspecialchars($_SESSION['user_name']); ?> <i class="fas fa-caret-down"></i>

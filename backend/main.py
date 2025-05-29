@@ -18,7 +18,9 @@ from openai import Client
 import base64
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
-
+from voice import generate_voice, generate_voice_stream
+from fastapi.responses import StreamingResponse, JSONResponse
+from MBBank.mbbank.main import getBank
 client = Client(
     api_key=os.getenv("OPENAI_API_KEY"),
 )
@@ -47,7 +49,31 @@ class Delete(BaseModel):
     id_user: str
 class ImageAnalysisRequest(BaseModel):
     image_base64: str
+class TextRequest(BaseModel):
+    text: str
+    voice_type: str = "mama"   # "assistant", "mama", "homie"
 
+@app.post("/voice")
+async def voice(request: TextRequest):
+    try:
+        wav_bytes = generate_voice(request.text, request.voice_type)
+        base64_wav = base64.b64encode(wav_bytes).decode("utf-8")
+        return JSONResponse({"audio_base64": base64_wav})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
+@app.post("/voice/download")
+async def voice_download(request: TextRequest):
+    wav_bytes = generate_voice(request.text, request.voice_type)
+    filename = f"voice_{request.voice_type}.wav"
+    return StreamingResponse(io.BytesIO(wav_bytes), media_type="audio/wav", headers={
+        "Content-Disposition": f"attachment; filename={filename}"
+    })
+@app.post("/voice/stream")
+async def stream_voice(request: TextRequest):
+    generator = generate_voice_stream(request.text, request.voice_type)
+    # Response với media_type là "audio/wav", play trực tiếp luôn
+    return StreamingResponse(generator, media_type="audio/wav")
 @app.post("/analyze-bill")
 async def analyze_bill(
     file: UploadFile = File(...),
@@ -224,3 +250,13 @@ async def get_history(
             "message": str(e),
             "history": {}
         }
+
+@app.get("/bank")
+async def get_bank(
+    username: str,
+    password: str,
+    proxy: str = None
+):
+    return getBank(username, password, proxy)
+
+

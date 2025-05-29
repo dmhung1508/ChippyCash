@@ -1,9 +1,25 @@
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-header">
-            <h1><?php echo $auth_mode === 'register' ? 'Đăng ký tài khoản' : 'Đăng nhập'; ?></h1>
+            <h1><?php 
+                if ($auth_mode === 'register') {
+                    echo 'Đăng ký tài khoản';
+                } elseif ($auth_mode === 'admin_login') {
+                    echo '🛡️ Đăng nhập Admin';
+                } else {
+                    echo 'Đăng nhập';
+                }
+            ?></h1>
             <p class="auth-subtitle">
-                <?php echo $auth_mode === 'register' ? 'Tạo tài khoản mới để quản lý tài chính cá nhân' : 'Đăng nhập để quản lý tài chính cá nhân của bạn'; ?>
+                <?php 
+                if ($auth_mode === 'register') {
+                    echo 'Tạo tài khoản mới để quản lý tài chính cá nhân';
+                } elseif ($auth_mode === 'admin_login') {
+                    echo 'Truy cập hệ thống quản trị trong thời gian bảo trì';
+                } else {
+                    echo 'Đăng nhập để quản lý tài chính cá nhân của bạn';
+                }
+                ?>
             </p>
         </div>
         
@@ -28,6 +44,38 @@
                 
                 <div class="auth-links">
                     <p>Chưa có tài khoản? <a href="index.php?register">Đăng ký ngay</a></p>
+                </div>
+            </form>
+        <?php elseif ($auth_mode === 'admin_login'): ?>
+            <!-- Admin Login Form -->
+            <form method="POST" action="" class="auth-form">
+                <input type="hidden" name="admin_login" value="1">
+                
+                <div class="admin-notice" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center;">
+                    <i class="fas fa-crown" style="margin-right: 8px;"></i>
+                    <strong>Đăng nhập Admin</strong>
+                    <p style="margin: 0.5rem 0 0; font-size: 0.9rem;">Chỉ dành cho quản trị viên hệ thống</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">Tên đăng nhập Admin</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Mật khẩu Admin</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" name="login" class="btn-primary btn-block" style="background: linear-gradient(135deg, #fbbf24, #f59e0b);">
+                        <i class="fas fa-shield-alt" style="margin-right: 8px;"></i>
+                        Đăng nhập Admin
+                    </button>
+                </div>
+                
+                <div class="auth-links">
+                    <p><a href="index.php" style="color: #6b7280;">← Quay lại trang chính</a></p>
                 </div>
             </form>
         <?php else: ?>

@@ -54,7 +54,10 @@ try {
   // Bắt đầu giao dịch
   $conn->beginTransaction();
   
-  foreach ($transactions as $transaction) {
+  foreach ($transactions as $index => $transaction) {
+      // Debug logging
+      error_log("Processing transaction " . ($index + 1) . ": " . json_encode($transaction));
+      
       // Kiểm tra dữ liệu giao dịch
       if (!isset($transaction['type']) || !isset($transaction['name']) || !isset($transaction['amount'])) {
           $error_count++;
@@ -64,6 +67,10 @@ try {
       $type = $transaction['type'];
       $description = $transaction['name'];
       $amount = floatval($transaction['amount']);
+      $category = $transaction['category'] ?? null;
+      
+      // Debug category
+      error_log("Category from AI: " . ($category ?? 'null'));
       
       // Xác thực dữ liệu
       if (empty($type) || empty($description) || $amount <= 0) {
@@ -76,22 +83,28 @@ try {
           $type = 'expense';
       }
       
-      // Tìm danh mục phù hợp
-      $category = null;
-      $categories = getUserCategories($conn, $user_id, $type);
-      
-      // Cố gắng tìm danh mục phù hợp theo tên
-      foreach ($categories as $cat) {
-          if (stripos($description, $cat['name']) !== false) {
-              $category = $cat['name'];
-              break;
+      // Sử dụng category từ AI, nếu không có thì tìm tự động
+      if (empty($category)) {
+          $categories = getUserCategories($conn, $user_id, $type);
+          
+          // Cố gắng tìm danh mục phù hợp theo tên
+          foreach ($categories as $cat) {
+              if (stripos($description, $cat['name']) !== false) {
+                  $category = $cat['name'];
+                  break;
+              }
+          }
+          
+          // Nếu không tìm thấy danh mục, sử dụng danh mục đầu tiên hoặc "Chung"
+          if (!$category && !empty($categories)) {
+              $category = $categories[0]['name'];
+          } else if (!$category) {
+              $category = 'Chung';
           }
       }
       
-      // Nếu không tìm thấy danh mục, sử dụng danh mục đầu tiên hoặc null
-      if (!$category && !empty($categories)) {
-          $category = $categories[0]['name'];
-      }
+      // Debug final category before save
+      error_log("Final category to save: " . ($category ?? 'null'));
       
       // Thêm giao dịch
       $stmt = $conn->prepare("INSERT INTO transactions (user_id, amount, description, type, category, date, created_at) 

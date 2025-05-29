@@ -64,7 +64,7 @@ def load_chat_store_user(idd):
     else:
         chat_store = SimpleChatStore()
     return chat_store
-def save_income_expense(id_user, name, amount):
+def save_income_expense(id_user, name, amount, category):
     """Lưu dữ liệu thu nhập của người dùng vào trong file khi có thông tin thu nhập, chỉ có trong các loại thu nhập đã được định nghĩa trước đó, không cho phép người dùng tự định nghĩa loại thu nhập
     (lương, tiền thưởng, tiền bán hàng, ...)
 
@@ -72,6 +72,7 @@ def save_income_expense(id_user, name, amount):
         id_user (string): id của người dùng
         name (string): tên khoản thu nhập (lương, tiền thưởng, tiền bán hàng, ...)
         amount (int): số tiền
+        category (string): loại thu nhập (lương, tiền thưởng, tiền bán hàng, ...)
         """
     user_dir = f"db_store/{id_user}"
     if not os.path.exists(user_dir):
@@ -85,11 +86,12 @@ def save_income_expense(id_user, name, amount):
         "type": "income",
         "name": name,
         "amount": amount,
+        "category": category
     }
     data.append(new_entry)
     with open(f"{user_dir}/bill.json", "w") as f:
         json.dump(data, f)
-def save_outcome_expense(id_user, name, amount):
+def save_outcome_expense(id_user, name, amount, category):
     """Lưu dữ liệu chi tiêu của người dùng vào trong file khi có thông tin chi tiêu, chỉ có trong các loại chi tiêu đã được định nghĩa trước đó, không cho phép người dùng tự định nghĩa loại chi tiêu
     (tiền ăn uống, tiền đi lại, tiền học tập, ...)
 
@@ -97,6 +99,7 @@ def save_outcome_expense(id_user, name, amount):
         id_user (string): id của người dùng
         name (string): tên khoản chi tiêu (tiền ăn uống, tiền đi lại, tiền học tập, ...)
         amount (int): số tiền
+        category (string): loại chi tiêu (tiền ăn uống, tiền đi lại, tiền học tập, ...)
     """
     user_dir = f"db_store/{id_user}"
     if not os.path.exists(user_dir):
@@ -110,6 +113,7 @@ def save_outcome_expense(id_user, name, amount):
         "type": "outcome",
         "name": name,
         "amount": amount,
+        "category": category
     }
     data.append(new_entry)
     with open(f"{user_dir}/bill.json", "w") as f:

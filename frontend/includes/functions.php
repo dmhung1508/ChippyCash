@@ -46,14 +46,14 @@ function isEmailExists($conn, $email, $exclude_id = null) {
   return $stmt->rowCount() > 0;
 }
 
-function registerUser($conn, $name, $email, $password) {
+function registerUser($conn, $name, $username, $email, $password) {
   // Start transaction
   $conn->beginTransaction();
   
   try {
     // Insert user
-    $stmt = $conn->prepare("INSERT INTO users (name, email, password, created_at) VALUES (?, ?, ?, NOW())");
-    $userInserted = $stmt->execute([$name, $email, $password]);
+    $stmt = $conn->prepare("INSERT INTO users (name, username, email, password, created_at) VALUES (?, ?, ?, ?, NOW())");
+    $userInserted = $stmt->execute([$name, $username, $email, $password]);
     
     if (!$userInserted) {
       throw new Exception("Failed to create user account");
@@ -221,6 +221,12 @@ function getFilteredTotal($conn, $user_id, $type, $month = null, $year = null, $
 function getTotalTransactionCount($conn, $user_id) {
   $stmt = $conn->prepare("SELECT COUNT(*) FROM transactions WHERE user_id = ?");
   $stmt->execute([$user_id]);
+  return $stmt->fetchColumn() ?: 0;
+}
+
+function getTotalByType($conn, $user_id, $type) {
+  $stmt = $conn->prepare("SELECT SUM(amount) FROM transactions WHERE user_id = ? AND type = ?");
+  $stmt->execute([$user_id, $type]);
   return $stmt->fetchColumn() ?: 0;
 }
 
