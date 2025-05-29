@@ -5,6 +5,21 @@ $dbname = 'chippy';
 $username = 'root';
 $password = 'hung1234';
 
+// Mailgun API Configuration
+define('MAILGUN_API_KEY', 'api-key-mailgun');
+define('MAILGUN_DOMAIN', 'mail.dinhmanhhung.net');
+define('MAILGUN_FROM_EMAIL', 'postmaster@mail.dinhmanhhung.net');
+define('MAILGUN_FROM_NAME', 'Quản Lý Thu Chi');
+
+// Email settings
+$mailgun_config = [
+    'api_key' => MAILGUN_API_KEY,
+    'domain' => MAILGUN_DOMAIN,
+    'from_email' => MAILGUN_FROM_EMAIL,
+    'from_name' => MAILGUN_FROM_NAME,
+    'api_url' => 'https://api.mailgun.net/v3/' . MAILGUN_DOMAIN . '/messages'
+];
+
 try {
     // Create PDO connection with UTF-8 support
     $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);

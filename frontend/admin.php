@@ -142,8 +142,8 @@ function logAdminAction($adminId, $action, $targetType = null, $targetId = null,
 }
 
 function sendEmailNotification($to_email, $to_name, $subject, $message, $type = 'info') {
-    // Load Mailgun configuration
-    $mailgun_config = include 'config/mailgun.php';
+    // Load Mailgun configuration from database.php
+    global $mailgun_config;
     $mailgun_domain = $mailgun_config['domain'];
     $mailgun_api_key = $mailgun_config['api_key'];
     $from_email = $mailgun_config['from_email'];
@@ -623,7 +623,7 @@ function getRecentAdminLogs($conn) {
                     Gửi Email Thông Báo
                 </h3>
                 
-                <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:1rem;margin-bottom:1.5rem;">
+                <!-- <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:1rem;margin-bottom:1.5rem;">
                     <div style="display:flex;align-items:center;gap:0.5rem;color:#1e40af;font-weight:600;margin-bottom:0.5rem;">
                         <i class="fas fa-info-circle"></i>
                         <span>📧 Gửi qua Mailgun API</span>
@@ -632,7 +632,7 @@ function getRecentAdminLogs($conn) {
                         Thông báo sẽ được gửi qua email đến người dùng sử dụng Mailgun service 
                         (<strong>mail.dinhmanhhung.net</strong>). Đồng thời cũng lưu vào database để hiển thị trong hệ thống.
                     </p>
-                </div>
+                </div> -->
                 
                 <form method="POST" style="max-width:600px;">
                     <input type="hidden" name="action" value="send_notification">
