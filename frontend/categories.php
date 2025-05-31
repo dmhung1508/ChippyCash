@@ -620,6 +620,61 @@ document.addEventListener('DOMContentLoaded', function() {
         firstPane.style.transform = 'translateY(0)';
     }
 
+    // Xử lý chuyển đổi tab
+    const tabButtons = document.querySelectorAll('.magical-tab-button');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetTab = this.getAttribute('data-tab');
+            
+            console.log('Switching to tab:', targetTab);
+            
+            // Xóa active class từ tất cả tabs
+            tabButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--secondary-color)';
+                btn.style.boxShadow = 'none';
+                btn.style.transform = 'translateY(0) scale(1)';
+            });
+            
+            // Ẩn tất cả tab panes
+            tabPanes.forEach(pane => {
+                pane.classList.remove('active');
+                pane.style.opacity = '0';
+                pane.style.transform = 'translateY(15px)';
+                setTimeout(() => {
+                    if (!pane.classList.contains('active')) {
+                        pane.style.display = 'none';
+                    }
+                }, 200);
+            });
+            
+            // Active tab được click
+            this.classList.add('active');
+            this.style.background = 'var(--card-background)';
+            this.style.color = 'var(--primary-color)';
+            this.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
+            this.style.transform = 'translateY(-2px) scale(1.02)';
+            
+            // Hiển thị tab pane tương ứng
+            const targetPane = document.getElementById(targetTab);
+            if (targetPane) {
+                setTimeout(() => {
+                    targetPane.style.display = 'block';
+                    targetPane.classList.add('active');
+                    setTimeout(() => {
+                        targetPane.style.opacity = '1';
+                        targetPane.style.transform = 'translateY(0)';
+                    }, 50);
+                }, 200);
+            }
+            
+            console.log('Tab switched successfully to:', targetTab);
+        });
+    });
+
     // Tối ưu cho mobile - thu gọn text nếu màn hình quá nhỏ
     function optimizeTabsForMobile() {
         const tabButtons = document.querySelectorAll('.magical-tab-button span');
@@ -636,6 +691,95 @@ document.addEventListener('DOMContentLoaded', function() {
 
     optimizeTabsForMobile();
     window.addEventListener('resize', optimizeTabsForMobile);
+
+    // Xử lý modal thêm thể loại
+    const addCategoryBtn = document.getElementById('addCategoryBtn');
+    const emptyAddIncomeCategoryBtn = document.getElementById('emptyAddIncomeCategoryBtn');
+    const emptyAddExpenseCategoryBtn = document.getElementById('emptyAddExpenseCategoryBtn');
+    const addCategoryModal = document.getElementById('addCategoryModal');
+    const editCategoryModal = document.getElementById('editCategoryModal');
+    
+    // Mở modal thêm thể loại
+    function openAddModal(defaultType = 'income') {
+        const modalType = document.getElementById('modal-type');
+        if (modalType) {
+            modalType.value = defaultType;
+        }
+        addCategoryModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    if (addCategoryBtn) {
+        addCategoryBtn.addEventListener('click', () => {
+            // Xác định tab hiện tại để set default type
+            const activeTab = document.querySelector('.magical-tab-button.active');
+            const defaultType = activeTab && activeTab.getAttribute('data-tab') === 'expense-categories' ? 'expense' : 'income';
+            openAddModal(defaultType);
+        });
+    }
+    
+    if (emptyAddIncomeCategoryBtn) {
+        emptyAddIncomeCategoryBtn.addEventListener('click', () => openAddModal('income'));
+    }
+    
+    if (emptyAddExpenseCategoryBtn) {
+        emptyAddExpenseCategoryBtn.addEventListener('click', () => openAddModal('expense'));
+    }
+    
+    // Đóng modal
+    function closeModal(modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Event listeners cho đóng modal
+    document.querySelectorAll('.close-modal, .cancel-modal').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal) {
+                closeModal(modal);
+            }
+        });
+    });
+    
+    // Đóng modal khi click outside
+    window.addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal')) {
+            closeModal(e.target);
+        }
+    });
+    
+    // Xử lý nút edit
+    document.querySelectorAll('.edit-category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const categoryId = this.getAttribute('data-id');
+            const categoryData = document.querySelector(`.category-data[data-id="${categoryId}"]`);
+            
+            if (categoryData) {
+                document.getElementById('edit-category-id').value = categoryId;
+                document.getElementById('edit-name').value = categoryData.getAttribute('data-name');
+                document.getElementById('edit-description').value = categoryData.getAttribute('data-description');
+                document.getElementById('edit-type').value = categoryData.getAttribute('data-type');
+                
+                const usage = parseInt(categoryData.getAttribute('data-usage'));
+                const usageText = document.getElementById('edit-usage-text');
+                const usageHint = document.getElementById('edit-usage-hint');
+                
+                if (usage > 0) {
+                    usageText.textContent = `Thể loại này đã được sử dụng trong ${usage} giao dịch.`;
+                    usageHint.style.display = 'block';
+                } else {
+                    usageText.textContent = 'Thể loại này chưa được sử dụng trong bất kỳ giao dịch nào.';
+                    usageHint.style.display = 'none';
+                }
+                
+                editCategoryModal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+        });
+    });
+    
+    console.log('✅ Categories page JavaScript initialized successfully!');
 });
 </script>
 

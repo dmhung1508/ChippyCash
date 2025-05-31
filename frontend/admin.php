@@ -548,7 +548,7 @@ function getRecentAdminLogs($conn) {
                          </button>
                      </div>
                      
-                     <div class="maintenance-card" style="background:var(--hover-color);padding:1.5rem;border-radius:12px;border:1px solid var(--border-color);">
+                     <!-- <div class="maintenance-card" style="background:var(--hover-color);padding:1.5rem;border-radius:12px;border:1px solid var(--border-color);">
                          <h4 style="margin:0 0 1rem;color:var(--primary-color);display:flex;align-items:center;gap:0.5rem;">
                              <i class="fas fa-tools" style="color:#f59e0b;"></i>
                              Chế độ bảo trì
@@ -558,7 +558,7 @@ function getRecentAdminLogs($conn) {
                              <i class="fas fa-tools"></i> Bật bảo trì
                          </button>
                      </div>
-                     
+                      -->
                      <div class="stats-card" style="background:var(--hover-color);padding:1.5rem;border-radius:12px;border:1px solid var(--border-color);">
                          <h4 style="margin:0 0 1rem;color:var(--primary-color);display:flex;align-items:center;gap:0.5rem;">
                              <i class="fas fa-chart-bar" style="color:var(--accent-color);"></i>
@@ -1687,6 +1687,126 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// CSS cho admin page để đảm bảo navbar dropdown hoạt động
+const adminStyle = document.createElement('style');
+adminStyle.textContent = `
+    /* Admin page specific styles for navbar */
+    body .main-navbar {
+        z-index: 10001 !important;
+        position: relative !important;
+    }
+    
+    body .navbar-dropdown {
+        position: relative !important;
+        z-index: 10002 !important;
+    }
+    
+    body .dropdown-menu {
+        position: absolute !important;
+        top: 100% !important;
+        right: 0 !important;
+        z-index: 10003 !important;
+        background: var(--card-background) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 0.5rem !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+        min-width: 200px !important;
+    }
+    
+    body .dropdown-menu a {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        padding: 0.75rem 1rem !important;
+        color: var(--text-primary) !important;
+        text-decoration: none !important;
+        transition: background-color 0.2s ease !important;
+    }
+    
+    body .dropdown-menu a:hover {
+        background-color: var(--hover-color) !important;
+    }
+    
+    body .dropdown-toggle {
+        background: none !important;
+        border: none !important;
+        color: var(--text-secondary) !important;
+        font-size: 1rem !important;
+        cursor: pointer !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        padding: 0.5rem 0 !important;
+        transition: color 0.2s ease !important;
+    }
+    
+    body .dropdown-toggle:hover {
+        color: var(--accent-color) !important;
+    }
+`;
+document.head.appendChild(adminStyle);
+
+// Đặc biệt setup dropdown cho admin page
+document.addEventListener('DOMContentLoaded', function() {
+    // Setup dropdown specifically for admin page
+    const dropdownToggle = document.querySelector('.dropdown-toggle');
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+    
+    if (dropdownToggle && dropdownMenu) {
+        console.log('✅ Admin page: Dropdown elements found, setting up...');
+        
+        // Remove any existing event listeners
+        dropdownToggle.removeEventListener('click', window.adminDropdownHandler);
+        
+        // Create new handler
+        window.adminDropdownHandler = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('🖱️ Admin dropdown clicked');
+            
+            const isVisible = dropdownMenu.style.display === 'block';
+            dropdownMenu.style.display = isVisible ? 'none' : 'block';
+            
+            // Ensure dropdown is visible with high z-index
+            if (!isVisible) {
+                dropdownMenu.style.zIndex = '10000';
+                dropdownMenu.style.position = 'absolute';
+                dropdownMenu.style.top = '100%';
+                dropdownMenu.style.right = '0';
+                dropdownMenu.style.background = 'var(--card-background)';
+                dropdownMenu.style.border = '1px solid var(--border-color)';
+                dropdownMenu.style.borderRadius = '0.5rem';
+                dropdownMenu.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+                dropdownMenu.style.minWidth = '200px';
+            }
+        };
+        
+        // Add click event
+        dropdownToggle.addEventListener('click', window.adminDropdownHandler);
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.style.display = 'none';
+            }
+        });
+        
+        // Close dropdown on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                dropdownMenu.style.display = 'none';
+            }
+        });
+        
+        console.log('✅ Admin page: Dropdown setup completed!');
+    } else {
+        console.log('❌ Admin page: Dropdown elements not found');
+        console.log('Toggle:', dropdownToggle);
+        console.log('Menu:', dropdownMenu);
+    }
+});
 </script>
 
 <?php include 'includes/footer.php'; ?> 

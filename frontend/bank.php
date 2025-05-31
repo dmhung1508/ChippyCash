@@ -1436,9 +1436,51 @@ style.textContent = `
      
 // Auto Import JavaScript Functionality  
 document.addEventListener('DOMContentLoaded', function() {
+    // Setup dropdown menu for user logout
+    const setupDropdown = () => {
+        const dropdownToggle = document.querySelector('.dropdown-toggle')
+        const dropdownMenu = document.querySelector('.dropdown-menu')
+        
+        if (dropdownToggle && dropdownMenu) {
+            // Toggle dropdown on click
+            dropdownToggle.addEventListener('click', (e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                
+                const isVisible = dropdownMenu.style.display === 'block'
+                dropdownMenu.style.display = isVisible ? 'none' : 'block'
+                
+                console.log('Dropdown toggled:', !isVisible)
+            })
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                    dropdownMenu.style.display = 'none'
+                }
+            })
+            
+            // Close dropdown on escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    dropdownMenu.style.display = 'none'
+                }
+            })
+            
+            console.log("✅ Dropdown menu ready!")
+        } else {
+            console.log("❌ Dropdown elements not found")
+        }
+    }
+    
+    // Initialize dropdown
+    setupDropdown()
      
-     // Batch import button event listener
-    document.getElementById('batchImportBtn').addEventListener('click', batchImportTransactions);
+    // Batch import button event listener
+    const batchImportBtn = document.getElementById('batchImportBtn')
+    if (batchImportBtn) {
+        batchImportBtn.addEventListener('click', batchImportTransactions)
+    }
 });
 </script>
 

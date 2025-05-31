@@ -186,11 +186,11 @@ include 'includes/header.php';
                <button id="darkModeToggle" class="btn-icon" title="Chuyển đổi chế độ">
                    <i class="fas fa-moon"></i>
                </button>
-               <button id="addTransactionBtn" class="magical-header-button primary" style="background:linear-gradient(135deg,var(--accent-color),var(--primary-color));color:white;border:none;border-radius:16px;padding:14px 24px;font-weight:700;font-size:1rem;transition:all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;" onmouseover="this.style.background='linear-gradient(135deg,var(--primary-color),var(--positive-color))';this.style.transform='translateY(-4px) scale(1.05)';this.style.boxShadow='0 12px 40px rgba(102,126,234,0.5)'" onmouseout="this.style.background='linear-gradient(135deg,var(--accent-color),var(--primary-color))';this.style.transform='translateY(0) scale(1)';this.style.boxShadow='none'">
+               <!-- <button id="addTransactionBtn" class="magical-header-button primary" style="background:linear-gradient(135deg,var(--accent-color),var(--primary-color));color:white;border:none;border-radius:16px;padding:14px 24px;font-weight:700;font-size:1rem;transition:all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;" onmouseover="this.style.background='linear-gradient(135deg,var(--primary-color),var(--positive-color))';this.style.transform='translateY(-4px) scale(1.05)';this.style.boxShadow='0 12px 40px rgba(102,126,234,0.5)'" onmouseout="this.style.background='linear-gradient(135deg,var(--accent-color),var(--primary-color))';this.style.transform='translateY(0) scale(1)';this.style.boxShadow='none'">
                    <i class="fas fa-plus" style="font-size:1.1rem;animation:addIconBounce 3s ease-in-out infinite;"></i>
                    <span style="position:relative;z-index:2;">Thêm giao dịch</span>
                    <span class="button-shine-mega" style="position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);animation:buttonShineMega 4s ease-in-out infinite;"></span>
-               </button>
+               </button> -->
            </div>
        </div>
    </header>

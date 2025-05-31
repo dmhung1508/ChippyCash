@@ -123,11 +123,17 @@ try {
       $conn->commit();
       echo json_encode([
           'success' => true, 
+          'saved_count' => $success_count,
+          'error_count' => $error_count,
           'message' => "Đã lưu $success_count giao dịch thành công" . ($error_count > 0 ? ", $error_count giao dịch thất bại" : "")
       ]);
   } else {
       $conn->rollBack();
-      echo json_encode(['success' => false, 'message' => 'Không thể lưu giao dịch']);
+      echo json_encode([
+          'success' => false, 
+          'saved_count' => 0,
+          'error' => 'Không thể lưu giao dịch nào'
+      ]);
   }
   
 } catch (Exception $e) {

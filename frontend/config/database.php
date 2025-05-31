@@ -6,7 +6,7 @@ $username = 'root';
 $password = 'hung1234';
 
 // Mailgun API Configuration
-define('MAILGUN_API_KEY', 'api-key-mailgun');
+define('MAILGUN_API_KEY', 'api_mail_gun');
 define('MAILGUN_DOMAIN', 'mail.dinhmanhhung.net');
 define('MAILGUN_FROM_EMAIL', 'postmaster@mail.dinhmanhhung.net');
 define('MAILGUN_FROM_NAME', 'Quản Lý Thu Chi');

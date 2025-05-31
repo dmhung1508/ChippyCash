@@ -13,13 +13,25 @@ if (isset($_SESSION['user_id']) && !isset($conn)) {
     <title><?php echo $pageTitle ?? 'Quản lý Thu Chi'; ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Dark Mode Sync Script -->
+    <script>
+        // Áp dụng dark mode ngay lập tức từ localStorage (trước khi trang load)
+        (function() {
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                document.documentElement.classList.add('dark-mode');
+                document.body.classList.add('dark-mode');
+            }
+        })();
+    </script>
 </head>
 <body>
     <?php if (isset($_SESSION['user_id']) && !isset($hideNavbar)): ?>
     <nav class="main-navbar">
         <div class="navbar-container">
             <div class="navbar-logo">
-                <a href="index.php">QuanLyThuChi</a>
+                <a href="index.php">ChippyCash</a>
             </div>
             <div class="navbar-menu">
                 <a href="index.php" class="navbar-item <?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>">
