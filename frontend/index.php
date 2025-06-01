@@ -1746,9 +1746,9 @@ window.addEventListener('load', function() {
 
 <?php include 'includes/footer.php'; ?>
 <!-- Floating Action Button -->
-<div id="floatingActionBtn" style="position:fixed;bottom:32px;right:32px;width:64px;height:64px;background:var(--accent-color);border-radius:50%;box-shadow:0 8px 32px rgba(102,126,234,0.4);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1000;transition:all 0.3s ease;animation:float 3s ease-in-out infinite;" onclick="document.getElementById('addTransactionBtn').click()" onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 12px 40px rgba(102,126,234,0.6)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 8px 32px rgba(102,126,234,0.4)'">
+<!-- <div id="floatingActionBtn" style="position:fixed;bottom:32px;right:32px;width:64px;height:64px;background:var(--accent-color);border-radius:50%;box-shadow:0 8px 32px rgba(102,126,234,0.4);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1000;transition:all 0.3s ease;animation:float 3s ease-in-out infinite;" onclick="document.getElementById('addTransactionBtn').click()" onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 12px 40px rgba(102,126,234,0.6)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 8px 32px rgba(102,126,234,0.4)'">
     <i class="fas fa-plus" style="color:white;font-size:1.5rem;"></i>
-</div>
+</div> -->
 
 <!-- Enhanced CSS Animations -->
 <style>
