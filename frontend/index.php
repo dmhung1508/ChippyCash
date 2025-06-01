@@ -74,8 +74,8 @@ if (!isset($_SESSION['user_id'])) {
        if (!canUserRegister($conn)) {
            setFlashMessage('error', 'Hệ thống hiện tại không cho phép đăng ký user mới.');
        } else {
-           $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-           $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+           $name = trim($_POST['name'] ?? '');
+           $username = trim($_POST['username'] ?? '');
            $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
            $password = $_POST['password'] ?? '';
            $confirm_password = $_POST['confirm_password'] ?? '';

@@ -36,9 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Add transaction
     if ($action === 'add') {
         $amount = filter_input(INPUT_POST, 'amount', FILTER_VALIDATE_FLOAT);
-        $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $description = trim($_POST['description'] ?? '');
         $type = filter_input(INPUT_POST, 'type', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $category = filter_input(INPUT_POST, 'category', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $category = trim($_POST['category'] ?? '');
         $date = filter_input(INPUT_POST, 'date', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         
         if (validateRequiredFields(['amount' => $amount, 'description' => $description, 'type' => $type, 'date' => $date])) {
@@ -56,9 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'update') {
         $transaction_id = filter_input(INPUT_POST, 'transaction_id', FILTER_VALIDATE_INT);
         $amount = filter_input(INPUT_POST, 'amount', FILTER_VALIDATE_FLOAT);
-        $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $description = trim($_POST['description'] ?? '');
         $type = filter_input(INPUT_POST, 'type', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $category = filter_input(INPUT_POST, 'category', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $category = trim($_POST['category'] ?? '');
         $date = filter_input(INPUT_POST, 'date', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         
         if (validateRequiredFields(['transaction_id' => $transaction_id, 'amount' => $amount, 'description' => $description, 'type' => $type, 'date' => $date])) {
@@ -354,7 +354,7 @@ include 'includes/header.php';
                                         <td style="padding:18px 20px;border:none;color:var(--primary-color);font-weight:600;font-size:0.9rem;">
                                             <div style="display:flex;align-items:center;gap:8px;">
                                                 <i class="fas fa-receipt" style="color:var(--accent-color);font-size:0.8rem;opacity:0.6;"></i>
-                                                <?php echo htmlspecialchars($transaction['description']); ?>
+                                                <?php echo htmlspecialchars($transaction['description'], ENT_QUOTES, 'UTF-8'); ?>
                                             </div>
                                         </td>
                                         <td style="padding:18px 20px;border:none;color:var(--secondary-color);font-size:0.9rem;">
@@ -380,7 +380,7 @@ include 'includes/header.php';
                                                 <button class="magical-btn-icon edit-transaction-btn" title="Chỉnh sửa" style="background:var(--accent-color);color:white;padding:8px;border:none;border-radius:8px;transition:all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);font-size:0.8rem;cursor:pointer;position:relative;overflow:hidden;" 
                                                     data-id="<?php echo $transaction['id']; ?>"
                                                     data-amount="<?php echo $transaction['amount']; ?>"
-                                                    data-description="<?php echo htmlspecialchars($transaction['description']); ?>"
+                                                    data-description="<?php echo htmlspecialchars($transaction['description'], ENT_QUOTES, 'UTF-8'); ?>"
                                                     data-type="<?php echo $transaction['type']; ?>"
                                                     data-category="<?php echo htmlspecialchars($transaction['category'] ?? ''); ?>"
                                                     data-date="<?php echo $transaction['date']; ?>"
@@ -459,12 +459,12 @@ include 'includes/header.php';
                 
                 <div class="form-group">
                     <label for="transactionAmount">Số tiền <span style="color: red;">*</span></label>
-                    <input type="number" id="transactionAmount" name="amount" step="1000" min="1" required>
+                    <input type="number" id="transactionAmount" name="amount" step="1" min="1" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="transactionDescription">Mô tả <span style="color: red;">*</span></label>
-                    <input type="text" id="transactionDescription" name="description" required placeholder="VD: Ăn trưa, Lương tháng...">
+                    <input type="text" id="transactionDescription" name="description" required placeholder="VD: Ăn trưa, Lương tháng..." accept-charset="UTF-8">
                 </div>
                 
                 <div class="form-group">
@@ -804,6 +804,17 @@ document.addEventListener('DOMContentLoaded', function() {
 @media (prefers-reduced-motion: reduce) {
     * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
     .floating-particles, .header-pattern { display: none !important; }
+}
+
+/* Vietnamese Font Support */
+body, input, textarea, select, button {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+}
+
+/* Ensure UTF-8 text input rendering */
+input[type="text"], textarea {
+    unicode-bidi: normal !important;
+    text-rendering: optimizeLegibility !important;
 }
 </style>
 <!-- Enhanced Magical JavaScript -->

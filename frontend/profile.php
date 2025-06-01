@@ -17,33 +17,38 @@ $_SESSION['user_name'] = $user['name'];
 
 // Process profile update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
-           $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-   $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-   
-   if (!$name || strlen($name) < 3) {
-       setFlashMessage('error', 'Tên phải có ít nhất 3 ký tự');
-   } elseif (!$username || strlen($username) < 3) {
-       setFlashMessage('error', 'Tên đăng nhập phải có ít nhất 3 ký tự');
-   } elseif (strpos($username, ' ') !== false) {
-       setFlashMessage('error', 'Tên đăng nhập không được chứa khoảng trắng');
-   } elseif ($username !== $user['username'] && isUsernameExists($conn, $username)) {
-       setFlashMessage('error', 'Tên đăng nhập đã được sử dụng bởi tài khoản khác');
-   } elseif (!$email) {
-       setFlashMessage('error', 'Email không hợp lệ');
-   } elseif ($email !== $user['email'] && isEmailExists($conn, $email)) {
-       setFlashMessage('error', 'Email đã được sử dụng bởi tài khoản khác');
-   } else {
-       if (updateUserProfile($conn, $user_id, $name, $username, $email)) {
-           setFlashMessage('success', 'Cập nhật thông tin thành công!');
-           // Update user info
-           $user = getUserById($conn, $user_id);
-           // Update session
-           $_SESSION['user_name'] = $name;
-       } else {
-           setFlashMessage('error', 'Đã xảy ra lỗi khi cập nhật thông tin.');
-       }
-   }
+    $name = trim($_POST['name'] ?? '');
+    $username = trim($_POST['username'] ?? '');
+    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+    
+    // Đảm bảo UTF-8 encoding cho name
+    if ($name) {
+        $name = mb_convert_encoding($name, 'UTF-8', 'UTF-8');
+    }
+    
+    if (!$name || strlen($name) < 3) {
+        setFlashMessage('error', 'Tên phải có ít nhất 3 ký tự');
+    } elseif (!$username || strlen($username) < 3) {
+        setFlashMessage('error', 'Tên đăng nhập phải có ít nhất 3 ký tự');
+    } elseif (strpos($username, ' ') !== false) {
+        setFlashMessage('error', 'Tên đăng nhập không được chứa khoảng trắng');
+    } elseif ($username !== $user['username'] && isUsernameExists($conn, $username)) {
+        setFlashMessage('error', 'Tên đăng nhập đã được sử dụng bởi tài khoản khác');
+    } elseif (!$email) {
+        setFlashMessage('error', 'Email không hợp lệ');
+    } elseif ($email !== $user['email'] && isEmailExists($conn, $email)) {
+        setFlashMessage('error', 'Email đã được sử dụng bởi tài khoản khác');
+    } else {
+        if (updateUserProfile($conn, $user_id, $name, $username, $email)) {
+            setFlashMessage('success', 'Cập nhật thông tin thành công!');
+            // Update user info
+            $user = getUserById($conn, $user_id);
+            // Update session
+            $_SESSION['user_name'] = $name;
+        } else {
+            setFlashMessage('error', 'Đã xảy ra lỗi khi cập nhật thông tin.');
+        }
+    }
 }
 
 // Process password change

@@ -17,8 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    
    // Add category
    if ($action === 'add') {
-       $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-       $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+       $name = trim($_POST['name'] ?? '');
+       $description = trim($_POST['description'] ?? '');
        $type = filter_input(INPUT_POST, 'type', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
        
        if (empty($name)) {
@@ -39,8 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    // Update category
    if ($action === 'update') {
        $category_id = filter_input(INPUT_POST, 'category_id', FILTER_VALIDATE_INT);
-       $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-       $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+       $name = trim($_POST['name'] ?? '');
+       $description = trim($_POST['description'] ?? '');
        $type = filter_input(INPUT_POST, 'type', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
        
        $category = getCategoryById($conn, $category_id, $user_id);

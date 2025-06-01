@@ -206,6 +206,7 @@ const setupChatbot = () => {
 
   // Biến để theo dõi trạng thái xử lý
   let isProcessing = false
+  let isImageProcessing = false  // Biến riêng cho image processing
   // Biến lưu trữ giao dịch hiện tại
   let currentTransactions = []
 
@@ -434,6 +435,7 @@ const setupChatbot = () => {
       message: message, 
       messageLength: message.length,
       isProcessing: isProcessing,
+      isImageProcessing: isImageProcessing,
       showUserMessage: showUserMessage 
     })
     
@@ -443,11 +445,11 @@ const setupChatbot = () => {
     }
     
     if (isProcessing) {
-      console.log("Đang xử lý, thoát")
+      console.log("⚠️ isProcessing = true, thoát sendChatMessage")
       return
     }
 
-    console.log("sendChatMessage được gọi:", { message, showUserMessage })
+    console.log("✅ sendChatMessage được gọi:", { message, showUserMessage })
 
     isProcessing = true
 
@@ -563,7 +565,7 @@ const setupChatbot = () => {
 
     // Thêm sự kiện cho nút tải lên
     uploadButton.addEventListener("click", () => {
-      if (!isProcessing) {
+      if (!isImageProcessing) {
         fileInput.click()
       }
     })
@@ -674,9 +676,9 @@ const setupChatbot = () => {
 
   // Hàm phân tích ảnh hóa đơn
   const analyzeBillImage = async (file) => {
-    if (!file || isProcessing) return
+    if (!file || isImageProcessing) return
 
-    isProcessing = true
+    isImageProcessing = true
 
     try {
       console.log("Bắt đầu phân tích ảnh...")
@@ -733,14 +735,14 @@ const setupChatbot = () => {
       removeTypingIndicator()
       addMessageToChat("Đã xảy ra lỗi khi phân tích ảnh. Vui lòng thử lại sau.", "bot")
     } finally {
-      isProcessing = false
+      isImageProcessing = false
     }
   }
 
   // Event listeners
   sendQuestion.addEventListener("click", () => sendChatMessage())
   questionInput.addEventListener("keypress", function(e) {
-    if (e.key === "Enter" && !isProcessing) {
+    if (e.key === "Enter" && !isProcessing && !isImageProcessing) {
       e.preventDefault()
       sendChatMessage()
     }
@@ -913,6 +915,27 @@ const setupChatbot = () => {
 
       if (data.success) {
         addMessageToChat(`✅ Đã lưu thành công ${data.saved_count} giao dịch!`, "bot")
+        
+        // Gọi API xóa lịch sử chat sau khi save thành công
+        const userId = document.getElementById("user-id")?.value || "user"
+        fetch("http://127.0.0.1:8506/delete", {
+          method: "POST",
+          headers: {
+            accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id_user: userId }),
+        })
+          .then((response) => {
+            if (response.ok) {
+              console.log("✅ Lịch sử chat đã được xóa")
+            } else {
+              console.error("❌ Không thể xóa lịch sử chat")
+            }
+          })
+          .catch((error) => {
+            console.error("🔥 Lỗi khi xóa lịch sử chat:", error)
+          })
         
         // Tự động cập nhật giao diện mà không reload
         setTimeout(() => {
